@@ -2,6 +2,7 @@
  * Pinterest API Functions
  */
 const dotenv = require('dotenv');
+const axios = require('axios');
 
 // Load environment variables
 dotenv.config();
@@ -42,3 +43,8 @@ async function listBoards(accessToken, params = {}) {
     throw error;
   }
 }
+
+module.exports = {
+  getUserInfo,
+  listBoards
+};

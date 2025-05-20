@@ -95,7 +95,7 @@ httpServer.listen(PORT, async () => {
     console.log('No authentication token found. Opening browser for authentication...');
     await open(`http://localhost:${PORT}/auth`);
   } else {
-    console.log('Authentication token found.');
+    console.log('Authentication token file found.');
     
     // Verify token is valid
     try {

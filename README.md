@@ -41,7 +41,7 @@ PINTEREST_APP_SECRET=your_pinterest_app_secret
 ```
 
 5. Register your application on the [Pinterest Developer Platform](https://developers.pinterest.com/apps/)
-   - Add `http://localhost:8085/` as an authorized redirect URI
+   - Add `http://localhost:3052/` as an authorized redirect URI
 
 ## Usage
 

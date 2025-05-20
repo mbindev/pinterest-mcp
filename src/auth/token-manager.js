@@ -14,7 +14,7 @@ dotenv.config();
 // Configuration
 const PINTEREST_APP_ID = process.env.PINTEREST_APP_ID;
 const PINTEREST_APP_SECRET = process.env.PINTEREST_APP_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:8085/';
+const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:3052/';
 const PINTEREST_API_URL = process.env.PINTEREST_API_URL || 'https://api.pinterest.com/v5';
 const TOKEN_PATH = path.join(__dirname, '..', '..', 'tokens', 'pinterest_token.json');
 
@@ -28,7 +28,7 @@ async function storeToken(token) {
   const tokenData = {
     access_token: token.access_token,
     refresh_token: token.refresh_token || null,
-    expires_at: token.expires_at || (Date.now() + 7200000), // Default 2 hours
+    expires_at: token.expires_at || (Date.now() + 86400000), // Default 24 hours
     scopes: token.scopes || [],
     name: token.name || 'Pinterest API Token'
   };
@@ -78,6 +78,42 @@ function isTokenExpired(token, bufferSeconds = 3052) {
   return token.expires_at < Date.now() + (bufferSeconds * 1000);
 }
 
+async function inspectToken() {
+  try {
+    const response = await axios.post(`${PINTEREST_API_URL}/oauth/token`, 
+      new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: readToken().refresh_token,
+        scope: 'boards:read'
+      }).toString(), 
+      {
+        headers: {
+          'Authorization': `Basic ${Buffer.from(`${PINTEREST_APP_ID}:${PINTEREST_APP_SECRET}`).toString('base64')}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    );
+
+    const token = {
+      access_token: response.data.access_token,
+			response_type: response.data.response_type,
+			token_type: response.data.token_type,
+			expires_in: response.data.expires_in,
+			ßexpires_at: response.data.expires_at,
+			scope: response.data.scope,
+      refresh_token: response.data.refresh_token,
+      refresh_token_expires_at: response.data.expires_at,
+      refresh_token_expires_in: response.data.expires_in,
+    };
+
+    // Store the new token
+    await storeToken(token);
+    return token;
+  } catch (error) {
+    console.error('Error inspecting token:', error.response?.data || error.message);
+    throw error;
+  }
+}
 /**
  * Refreshes an access token using the refresh token
  * @param {string} refreshToken Refresh token
@@ -85,20 +121,30 @@ function isTokenExpired(token, bufferSeconds = 3052) {
  */
 async function refreshToken(refreshToken) {
   try {
-    const response = await axios.post(`${PINTEREST_API_URL}/oauth/token`, null, {
-      params: {
+    const response = await axios.post(`${PINTEREST_API_URL}/oauth/token`, 
+      new URLSearchParams({
         grant_type: 'refresh_token',
-        client_id: PINTEREST_APP_ID,
-        client_secret: PINTEREST_APP_SECRET,
-        refresh_token: refreshToken
+        refresh_token: readToken().refresh_token,
+        scope: 'boards:read'
+      }).toString(), 
+      {
+        headers: {
+          'Authorization': `Basic ${Buffer.from(`${PINTEREST_APP_ID}:${PINTEREST_APP_SECRET}`).toString('base64')}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       }
-    });
+    );
 
     const token = {
       access_token: response.data.access_token,
+			response_type: response.data.response_type,
+			token_type: response.data.token_type,
+			expires_in: response.data.expires_in,
+			expires_at: response.data.expires_at,
+			scope: response.data.scope,
       refresh_token: response.data.refresh_token,
-      expires_at: Date.now() + (response.data.expires_in * 1000),
-      scopes: response.data.scope ? response.data.scope.split(' ') : []
+      refresh_token_expires_at: response.data.expires_at,
+      refresh_token_expires_in: response.data.expires_in,
     };
 
     // Store the new token
@@ -119,8 +165,7 @@ async function getValidToken() {
     const token = readToken();
     
     if (!token) {
-      console.log('No token found. Authentication required.');
-      return null;
+      throw new Error('No token found. Authentication required.');
     }
     
     // Check if token is expired
@@ -138,7 +183,7 @@ async function getValidToken() {
     return token;
   } catch (error) {
     console.error('Error getting valid token:', error.message);
-    return null;
+    throw error;
   }
 }
 
@@ -149,21 +194,30 @@ async function getValidToken() {
  */
 async function exchangeCodeForToken(code) {
   try {
-    const response = await axios.post(`${PINTEREST_API_URL}/oauth/token`, null, {
-      params: {
+    const response = await axios.post(`${PINTEREST_API_URL}/oauth/token`, 
+      new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: PINTEREST_APP_ID,
-        client_secret: PINTEREST_APP_SECRET,
-        code,
-        redirect_uri: REDIRECT_URI
+        code: code,
+        redirect_uri: REDIRECT_URI,
+        continuous_refresh: 'true'
+      }).toString(), 
+      {
+        headers: {
+          'Authorization': `Basic ${Buffer.from(`${PINTEREST_APP_ID}:${PINTEREST_APP_SECRET}`).toString('base64')}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       }
-    });
+    );
 
     const token = {
       access_token: response.data.access_token,
       refresh_token: response.data.refresh_token,
-      expires_at: Date.now() + (response.data.expires_in * 1000),
-      scopes: response.data.scope ? response.data.scope.split(' ') : []
+			response_type: response.data.response_type,
+			token_type: response.data.token_type,
+			expires_in: response.data.expires_in,
+			expires_at: response.data.expires_at,
+			refresh_token_expires_in: response.data.refresh_token_expires_in,
+      scopes: response.data.scope
     };
 
     // Store the new token
@@ -213,6 +267,7 @@ module.exports = {
   storeToken,
   readToken,
   isTokenExpired,
+	inspectToken,
   refreshToken,
   getValidToken,
   exchangeCodeForToken,

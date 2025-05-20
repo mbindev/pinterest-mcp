@@ -11,7 +11,7 @@ dotenv.config();
 
 // Configuration
 const PINTEREST_APP_ID = process.env.PINTEREST_APP_ID;
-const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:8085/';
+const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:3052/';
 
 /**
  * Generates the Pinterest OAuth URL for authentication
