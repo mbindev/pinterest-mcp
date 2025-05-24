@@ -1,6 +1,7 @@
 # Dependencies
 node_modules/
 package-lock.json
+claude_desktop_c*
 yarn.lock
 
 # Environment variables

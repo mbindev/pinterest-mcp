@@ -1,3 +1,4 @@
+const axios = require('axios');
 const dotenv = require('dotenv');
 
 // Load environment variables
@@ -55,3 +56,9 @@ async function getPinDetails(accessToken, pinId) {
     throw error;
   }
 }
+
+module.exports = {
+  listPins,
+  createPin,
+  getPinDetails
+};

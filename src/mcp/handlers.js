@@ -29,25 +29,25 @@ async function handleToolExecution(toolName, parameters) {
     }
 
     switch (toolName) {
-      case 'pinterest.user.get_info':
+      case 'pinterest_user_get_info':
         return await getUserInfo(token.access_token);
       
-      case 'pinterest.boards.list':
+      case 'pinterest_boards_list':
         return await listBoards(token.access_token, parameters);
       
-      case 'pinterest.boards.create':
+      case 'pinterest_boards_create':
         return await createBoard(token.access_token, parameters);
       
-      case 'pinterest.boards.get':
+      case 'pinterest_boards_get':
         return await getBoardDetails(token.access_token, parameters.boardId);
       
-      case 'pinterest.pins.list':
+      case 'pinterest_pins_list':
         return await listPins(token.access_token, parameters.boardId, parameters);
       
-      case 'pinterest.pins.create':
+      case 'pinterest_pins_create':
         return await createPin(token.access_token, parameters);
       
-      case 'pinterest.pins.get':
+      case 'pinterest_pins_get':
         return await getPinDetails(token.access_token, parameters.pinId);
       
       default:

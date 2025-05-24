@@ -1,18 +1,21 @@
 /**
- * MCP Server Implementation
+ * MCP Tools Definition
  */
 
-// MCP tools definition
+// MCP tools definition (Fixed names for Claude Desktop compatibility)
 const mcp_tools = [
   {
-    name: 'pinterest.user.get_info',
+    name: 'pinterest_user_get_info',
     description: 'Get information about the authenticated Pinterest user',
-    parameters: {}
+    inputSchema: {
+      type: 'object',
+      properties: {}
+    }
   },
   {
-    name: 'pinterest.boards.list',
+    name: 'pinterest_boards_list',
     description: 'List boards for the authenticated user',
-    parameters: {
+    inputSchema: {
       type: 'object',
       properties: {
         pageSize: {
@@ -27,9 +30,9 @@ const mcp_tools = [
     }
   },
   {
-    name: 'pinterest.boards.create',
+    name: 'pinterest_boards_create',
     description: 'Create a new Pinterest board',
-    parameters: {
+    inputSchema: {
       type: 'object',
       required: ['name'],
       properties: {
@@ -50,9 +53,9 @@ const mcp_tools = [
     }
   },
   {
-    name: 'pinterest.boards.get',
+    name: 'pinterest_boards_get',
     description: 'Get details of a specific Pinterest board',
-    parameters: {
+    inputSchema: {
       type: 'object',
       required: ['boardId'],
       properties: {
@@ -64,9 +67,9 @@ const mcp_tools = [
     }
   },
   {
-    name: 'pinterest.pins.list',
+    name: 'pinterest_pins_list',
     description: 'List pins on a Pinterest board',
-    parameters: {
+    inputSchema: {
       type: 'object',
       required: ['boardId'],
       properties: {
@@ -86,9 +89,9 @@ const mcp_tools = [
     }
   },
   {
-    name: 'pinterest.pins.create',
+    name: 'pinterest_pins_create',
     description: 'Create a new Pinterest pin',
-    parameters: {
+    inputSchema: {
       type: 'object',
       required: ['board_id', 'media_source'],
       properties: {
@@ -139,9 +142,9 @@ const mcp_tools = [
     }
   },
   {
-    name: 'pinterest.pins.get',
+    name: 'pinterest_pins_get',
     description: 'Get details of a specific Pinterest pin',
-    parameters: {
+    inputSchema: {
       type: 'object',
       required: ['pinId'],
       properties: {
@@ -153,3 +156,7 @@ const mcp_tools = [
     }
   }
 ];
+
+module.exports = {
+  mcp_tools
+};
